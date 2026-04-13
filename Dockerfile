@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-# Install all required system libraries for Chrome/Puppeteer on Alpine
+# Install Chrome + dependencies for whatsapp-web.js
 RUN apk add --no-cache \
     chromium \
     nss \
@@ -16,7 +16,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# Use npm install (works without package-lock.json)
+# This line is the fix (uses npm install instead of npm ci)
 RUN npm install --production
 
 COPY . .
