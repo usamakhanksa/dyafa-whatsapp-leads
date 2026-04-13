@@ -16,8 +16,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# This line is the fix (uses npm install instead of npm ci)
-RUN npm install --production
+RUN npm ci --omit=dev
 
 COPY . .
 
