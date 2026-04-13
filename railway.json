@@ -1,4 +1,4 @@
 {
-  "buildCommand": "npm install",
+  "buildCommand": "npm ci --production",
   "startCommand": "node server.js"
 }
