@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dyafa Test Chat</title>
+  <style>body{font-family:Arial;margin:40px}input,textarea,button{width:100%;padding:12px;margin:10px 0}</style>
+</head>
+<body>
+  <h1>🧪 Test WhatsApp Lead</h1>
+  <input id="name" placeholder="Your Name" value="Test User">
+  <input id="phone" placeholder="Phone">
+  <textarea id="message" rows="4">Hello, I want information about Dyafa</textarea>
+  <button onclick="send()">Send to WhatsApp</button>
+
+  <script>
+    async function send() {
+      const res = await fetch('/send-message', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          message: document.getElementById('message').value,
+          visitorName: document.getElementById('name').value,
+          visitorPhone: document.getElementById('phone').value
+        })
+      });
+      const data = await res.json();
+      alert(data.success ? '✅ Sent to your WhatsApp!' : '❌ Error');
+    }
+  </script>
+</body>
+</html>
