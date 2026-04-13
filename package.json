@@ -1,7 +1,6 @@
 {
   "name": "dyafa-whatsapp-leads",
   "version": "1.0.0",
-  "description": "WhatsApp lead forwarder for Dyafa website (one-time QR)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
