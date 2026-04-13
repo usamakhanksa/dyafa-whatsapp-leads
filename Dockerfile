@@ -1,27 +1,26 @@
 FROM node:20-alpine
 
-# Install system dependencies for Chrome / Puppeteer
+# Install all required system libraries for Chrome/Puppeteer on Alpine
 RUN apk add --no-cache \
     chromium \
     nss \
     freetype \
     harfbuzz \
     ca-certificates \
-    ttf-freefont \
-    nodejs \
-    npm
+    ttf-freefont
 
-# Set Chrome path for whatsapp-web.js
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --production
+
+# Use npm install (works without package-lock.json)
+RUN npm install --production
 
 COPY . .
 
-# Expose Railway port
 EXPOSE 8080
 
 CMD ["node", "server.js"]
