@@ -2,29 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dyafa Test Chat</title>
-  <style>body{font-family:Arial;margin:40px}input,textarea,button{width:100%;padding:12px;margin:10px 0}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dyafa Website Chat Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background: #f8fafc; color: #111827; }
+    .card { max-width: 680px; margin: auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+    h1 { margin-top: 0; }
+    label { display: block; margin-top: 12px; font-weight: 700; }
+    input, textarea, button { width: 100%; box-sizing: border-box; padding: 12px; margin-top: 6px; border-radius: 8px; border: 1px solid #d1d5db; }
+    button { background: #2563eb; color: #fff; border: none; font-weight: 700; cursor: pointer; margin-top: 16px; }
+    .row { display: grid; gap: 12px; grid-template-columns: 1fr; }
+    @media (min-width: 700px) { .row { grid-template-columns: 1fr 1fr; } }
+    .muted { color: #4b5563; font-size: 0.95rem; }
+    a { color: #2563eb; }
+  </style>
 </head>
 <body>
-  <h1>🧪 Test WhatsApp Lead</h1>
-  <input id="name" placeholder="Your Name" value="Test User">
-  <input id="phone" placeholder="Phone">
-  <textarea id="message" rows="4">Hello, I want information about Dyafa</textarea>
-  <button onclick="send()">Send to WhatsApp</button>
+  <main class="card">
+    <h1>Website → WhatsApp inbox</h1>
+    <p class="muted">Scan QR once on <code>/qr</code>, then all website messages are forwarded by your Node service.</p>
+
+    <div class="row">
+      <div>
+        <label for="backend">Backend URL</label>
+        <input id="backend" placeholder="http://localhost:8080">
+      </div>
+      <div>
+        <label for="owner">Your WhatsApp number</label>
+        <input id="owner" placeholder="966510451995">
+      </div>
+    </div>
+
+    <label for="phone">Visitor phone number</label>
+    <input id="phone" placeholder="+9665xxxxxxxx">
+
+    <label for="message">Visitor message</label>
+    <textarea id="message" rows="4">Hello, I need details about Dyafa.</textarea>
+
+    <button id="sendBtn" onclick="sendMessage()">Send to my WhatsApp</button>
+    <p class="muted"><a id="directChat" href="#" target="_blank" rel="noopener">Open direct WhatsApp chat link</a></p>
+  </main>
 
   <script>
-    async function send() {
-      const res = await fetch('/send-message', {
+    const params = new URLSearchParams(window.location.search);
+    const backendInput = document.getElementById('backend');
+    const ownerInput = document.getElementById('owner');
+    const directChat = document.getElementById('directChat');
+
+    backendInput.value = params.get('backend') || 'http://localhost:8080';
+    ownerInput.value = params.get('to') || '';
+
+    function cleanNumber(value) {
+      return value.replace(/[^\d]/g, '');
+    }
+
+    function refreshChatLink() {
+      const num = cleanNumber(ownerInput.value);
+      directChat.href = num ? `https://wa.me/${num}` : '#';
+      directChat.textContent = num ? `Open direct WhatsApp chat: wa.me/${num}` : 'Open direct WhatsApp chat link';
+    }
+
+    ownerInput.addEventListener('input', refreshChatLink);
+    refreshChatLink();
+
+    async function sendMessage() {
+      const backend = backendInput.value.trim().replace(/\/$/, '');
+      const visitorPhone = document.getElementById('phone').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!backend) return alert('Enter backend URL first');
+      if (!visitorPhone) return alert('Enter visitor phone number');
+      if (!message) return alert('Enter message');
+
+      const res = await fetch(`${backend}/send-message`, {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: document.getElementById('message').value,
-          visitorName: document.getElementById('name').value,
-          visitorPhone: document.getElementById('phone').value
+          visitorName: 'Website Visitor',
+          visitorPhone,
+          message
         })
       });
-      const data = await res.json();
-      alert(data.success ? '✅ Sent to your WhatsApp!' : '❌ Error');
+
+      const data = await res.json().catch(() => ({}));
+      if (data.success) {
+        alert('✅ Sent to your WhatsApp number');
+      } else {
+        alert(`❌ ${data.error || 'Failed to send'}`);
+      }
     }
   </script>
 </body>
